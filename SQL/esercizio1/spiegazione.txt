@@ -1,0 +1,223 @@
+5. Obtener el precio medio de los artículos de la colección AMASANDO JA-PAN
+SELECT avg(pvp)
+FROM `articulos`
+WHERE id_col=19
+
+y
+SELECT avg(pvp)
+FROM `articulos`
+WHERE nombre like '%amasando ja-pan%'
+
+6. 7. Mostrar el precio más alto de los artículos (MAX) y (min)
+SELECT max(pvp),min(pvp)
+FROM `articulos`
+
+8. ¿Cuánto me costaría llevarme la colección entera de Naruto? (SUM)
+SELECT sum(pvp)
+FROM `articulos`
+where id_col = 1
+
+9. ¿Cuántos artículos valen más de 8.00€? (count)
+SELECT count(pvp)
+FROM `articulos`
+where pvp>8
+
+10. Mostrar las colecciones que contienen la palabra amor (like %)
+SELECT *
+FROM colecciones
+where nombre like '%amor%'
+
+11. Mostrar todos los tomos etiquetados como 01
+SELECT nombre
+FROM articulos
+where nombre like '% 01%'
+
+12. Mostrar las colecciones que empiezan por G
+SELECT nombre
+FROM colecciones
+where nombre like 'g%'
+
+13. Mostrar las colecciones editadas en catalán
+SELECT nombre
+FROM colecciones
+where nombre like '%catalan%'
+
+14. Mostrar las colecciones que el nombre no coincide con el nombre original (siempre y cuando se hayan
+informado los dos nombres)
+SELECT *
+FROM colecciones
+where nombre <> nombre_o
+AND nombre_o != ''
+
+oppure
+
+SELECT *
+FROM colecciones
+where not nombre = nombre_o
+AND not nombre_o = ''
+
+15. Mostrar el nombre y los precios de los artículos ordenados alfabéticamente (order by)
+SELECT nombre, pvp
+FROM articulos
+ORDER BY nombre
+
+16. Mostrar el nombre y los precios de los artículos ordenados por precio de mayor a menor y por nombre
+ascendentemente
+SELECT nombre, pvp
+FROM articulos
+ORDER BY pvp DESC, nombre asc
+
+17. Mostrar las colecciones que son mensuales ordenadas alfabéticamente
+SELECT nombre
+FROM colecciones
+WHERE periodicidad = 'mensual'
+ORDER BY nombre
+
+18. Mostrar las diferentes perioricidades que hay definidas (distinct)
+SELECT DISTINCT periodicidad
+FROM colecciones
+
+19. Mostrar las colecciones cerradas que tienen menos de 15 tomos ordenadas por el número de tomos
+SELECT nombre, n_tomos
+FROM colecciones
+WHERE tipo = 'cerrada'
+AND n_tomos < 15
+ORDER BY n_tomos
+
+20. Mostrar las colecciones donde el número de tomos es igual al último tomo que ha salido
+
+
+21. Mostrar las colecciones de autor DESCONOCIDO y que sean mensuales
+SELECT nombre
+FROM colecciones
+WHERE id_autor = 1
+and periodicidad = 'mensual'
+
+22. Mostrar los tomos únicos de AKIRA TORIYAMA 
+SELECT *
+FROM colecciones, autores
+WHERE colecciones.id_autor = autores.id
+and autores.nombre like '%AKIRA%'
+and autores.apellidos like '%TORIYAMA%'
+and colecciones.tipo = 'unico'
+
+23. Contar cuantas colecciones Shojo hay de la editorial IVREA que son abiertas pero no son mensuales
+SELECT colecciones.nombre, generos.genero, editoriales.nombre, colecciones.periodicidad
+FROM colecciones, generos, editoriales
+WHERE colecciones.id_editorial = editoriales.id
+and colecciones.id_genero = generos.id
+and generos.genero = 'shojo'
+and editoriales.nombre = 'ivrea'
+and not periodicidad = 'mensual'
+and tipo = 'abierta'
+
+24. Mostrar las colecciones Abiertas que sean Shonen o Shojo ordenadas por orden alfabético
+SELECT colecciones.nombre, generos.genero, colecciones.tipo
+FROM colecciones, generos
+WHERE colecciones.id_genero = generos.id
+and (generos.genero = 'shojo' OR generos.genero = 'shonen')
+and colecciones.tipo = 'abierta'
+ORDER by colecciones.nombre
+
+// qui si mettono le parentesi perch+ se no l'OR viene inteso che raccolga il SHONEN anche se non è aperta,
+quindi con la parentesi implica che si auna o l'altra ma che SEMPRE deve essere APERTA
+
+25. Mostrar las 10 primeras colecciones de genero Seinen (LIMIT)
+SELECT colecciones.nombre, generos.genero
+FROM colecciones, generos
+WHERE colecciones.id_genero = generos.id
+and generos.genero = 'Seinen'
+LIMIT 10
+
+26. Mostrar el nombre de la colección y el nombre de la editorial ordenados por orden alfabético de la
+colección. (join)
+SELECT colecciones.nombre, editoriales.nombre
+FROM colecciones, editoriales
+WHERE colecciones.id_editorial = editoriales.id
+ORDER BY 1
+
+27. Mostrar un listado con el nombre de la colección, el nombre de la editorial, el nombre del género y el
+nombre del autor. Ordenados alfabéticamente por género, editorial y nombre
+SELECT colecciones.nombre,
+		editoriales.nombre,
+        generos.genero,
+        autores.nombre
+FROM colecciones, editoriales, generos, autores
+WHERE colecciones.id_editorial = editoriales.id
+and colecciones.id_genero = generos.id
+and colecciones.id_autor = autores.id
+ORDER BY 3, 2, 4
+
+28. Mostrar un listado con el nombre del artículo, el precio, el nombre de la colección de las colecciones
+mensuales, ordenado por nombre de colección 
+SELECT articulos.nombre,
+		articulos.pvp,
+        colecciones.nombre
+FROM articulos, colecciones
+WHERE articulos.id_col = colecciones.id
+AND colecciones.periodicidad = 'mensual'
+ORDER BY colecciones.nombre, articulos.nombre
+
+29. Muestra las colecciones que sus artículos tiene un precio de 15 € ordenados alfabéticamente por nombre de
+la colección (distinct – join)
+
+
+33. ¿Cuántas colecciones hay de cada género? (Group by)
+SELECT generos.genero, COUNT(*) as 'Numero de colecciones'
+FROM colecciones, generos
+WHERE colecciones.id_genero = generos.id
+GROUP BY generos.genero
+
+ovvero
+
+SELECT generos.genero, COUNT(colecciones.id) as 'Numero de colecciones'
+FROM colecciones, generos
+WHERE colecciones.id_genero = generos.id
+GROUP BY generos.genero
+
+se voglio aggiungere una linea al risultato (tipo tendina per selezionare)
+
+SELECT "---seleccionar ---",0
+UNION
+SELECT generos.genero, COUNT(colecciones.id) as 'Numero de colecciones'
+FROM colecciones, generos
+WHERE colecciones.id_genero = generos.id
+GROUP BY generos.genero
+
+40. Mostrar la cantidad de artículos que tiene cada editorial, el precio promedio y la suma del precio de todos los artículos. 
+SELECT editoriales.nombre,
+		count(articulos.id_articulo) as 'Numero de articulos',
+        AVG(articulos.pvp) as 'Promedio del precio',
+        SUM(articulos.pvp) as 'Suma totale'
+FROM editoriales
+	LEFT JOIN colecciones on editoriales.id = colecciones.id_editorial
+    JOIN articulos on articulos.id_col = colecciones.id
+GROUP by editoriales.nombre
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
